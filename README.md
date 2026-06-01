@@ -2,6 +2,8 @@
 
 A machine learning pipeline for integrating multi-omics data across 32 cancer types using the TCGA Pan-Cancer Atlas dataset. Built as a graduate course project in Big Data Science (University of Colorado Denver, Applied Mathematics M.S. program).
 
+> **Note:** This project is currently being rebuilt with corrected preprocessing methodology and an expanded notebook structure. Notebooks are being added incrementally with full documentation of methodological decisions.
+
 ---
 
 ## Overview
@@ -19,7 +21,7 @@ Cancer subtypes share molecular signatures that cut across tissue of origin. Thi
 | Clinical data | TCGA Pan-Cancer Atlas | 8,314 | 6 variables |
 
 - **32 cancer types** represented (BRCA, PRAD, THCA, LGG, HNSC, and 27 others)
-- **6,364 total features** in the combined early-fusion matrix
+- **~1,006 total features** in the combined early-fusion matrix after feature selection (500 mRNA + 500 methylation + ~6 clinical)
 - Clinical variables: survival status, days to event, age at diagnosis, gender, pathologic stage, cancer label
 
 ---
@@ -39,18 +41,21 @@ Cancer subtypes share molecular signatures that cut across tissue of origin. Thi
 
 ### Preprocessing
 - Sample ID normalization and alignment across all three modalities (8,314 common samples)
-- Missing value imputation via `SimpleImputer` (mean strategy)
-- Feature scaling with `StandardScaler`
+- Top-500 highest-variance feature selection per omics modality (mRNA and methylation separately) — data-driven, label-free
+- Missing value imputation via `SimpleImputer` (mean strategy) — applied **before** scaling
+- Feature scaling with `StandardScaler` — applied **after** imputation
 - One-hot encoding of categorical clinical variables (gender, pathologic stage)
-- 2σ clipping for outlier handling
+
+> **Preprocessing order rationale:** Imputation must precede scaling because `StandardScaler` computes column statistics from the data. Imputing after scaling distorts those statistics and produces incorrect scaled values.
 
 ### Early Fusion
-All three modalities concatenated into a single (8,314 × 6,364) feature matrix prior to dimensionality reduction — preserving cross-modal relationships.
+All three modalities concatenated into a single (~8,314 × 1,006) feature matrix prior to dimensionality reduction — preserving cross-modal relationships between mRNA expression, methylation, and clinical variables.
 
 ### Dimensionality Reduction & Clustering
 - **PCA** to 50 components (retaining dominant variance structure)
-- **K-Means clustering** (k=5) on PCA-reduced space
-- **Silhouette Score: 0.534** — indicating strong, meaningful cluster separation
+- **k-selection** via elbow curve and silhouette sweep across k=2–10
+- **K-Means clustering** on PCA-reduced space at optimal k
+- **Silhouette score** reported after correct preprocessing (see Notebook 3)
 
 ### Evaluation
 - Silhouette score for internal cluster quality
@@ -62,16 +67,16 @@ All three modalities concatenated into a single (8,314 × 6,364) feature matrix 
 
 ## Key Result
 
-A silhouette score of **0.534** on the full 8,314-sample, 6,364-feature matrix indicates that the early-fusion representation captures genuine biological structure across cancer types — well above the threshold typically considered meaningful for high-dimensional omics data.
-
 Cluster 1 skewed markedly younger (mean age 44.1) compared to other clusters (ages 54–60), suggesting the clustering captures clinically meaningful patient subgroups beyond simple cancer-type separation.
+
+Full quantitative results including silhouette scores and cluster composition are reported in Notebook 5 after correct preprocessing.
 
 ---
 
 ## Tech Stack
 
 ```
-Python · scikit-learn · pandas · numpy · matplotlib · seaborn
+Python · scikit-learn · PyTorch · pandas · numpy · matplotlib · seaborn
 ```
 
 ---
@@ -80,20 +85,29 @@ Python · scikit-learn · pandas · numpy · matplotlib · seaborn
 
 ```
 PanCancer-MultiOmics/
-├── ProjectCode.ipynb     # Full pipeline: EDA, preprocessing, fusion, clustering, evaluation
-└── README.md
+├── .gitignore
+├── README.md
+├── requirements.txt
+├── data/
+│   └── README.md
+├── PanCancer_MultiOmics_Data_Loading_&_EDA.ipynb        ✓ complete
+├── PanCancer_MultiOmics_Preprocessing.ipynb              ⟳ in progress
+├── PanCancer_MultiOmics_PCA_Baseline.ipynb               planned
+├── PanCancer_MultiOmics_Transformer_Autoencoder.ipynb    planned
+└── PanCancer_MultiOmics_Evaluation.ipynb                 planned
 ```
 
-> **Note:** Raw TCGA data files are not included due to size. Data can be downloaded from the [GDC Data Portal](https://portal.gdc.cancer.gov/) or [PanCanAtlas Publications](https://gdc.cancer.gov/about-data/publications/pancanatlas).
+> **Note:** Raw TCGA data files are not included due to file size. Data can be downloaded from the [GDC Data Portal](https://portal.gdc.cancer.gov/) or [PanCanAtlas Publications](https://gdc.cancer.gov/about-data/publications/pancanatlas).
 
 ---
 
-## Next Steps (Planned)
+## Roadmap
 
-- [ ] Transformer-based unified tokenization for deep multi-omics embedding (RQ2 final model)
-- [ ] Feature importance analysis via SHAP values (RQ4)
-- [ ] Survival analysis by cluster using Kaplan-Meier curves (RQ3)
-- [ ] Comparison of early, late, and intermediate fusion strategies
+- [x] Data loading, alignment, and exploratory data analysis (Notebook 1)
+- [ ] Corrected preprocessing pipeline with feature selection (Notebook 2)
+- [ ] PCA baseline with data-driven k-selection via silhouette sweep (Notebook 3)
+- [ ] Transformer autoencoder for deep multi-omics embedding in PyTorch (Notebook 4)
+- [ ] Full evaluation — cluster interpretation, SHAP values, Kaplan-Meier survival curves (Notebook 5)
 
 ---
 
