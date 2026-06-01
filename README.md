@@ -91,7 +91,7 @@ PanCancer-MultiOmics/
 ├── data/
 │   └── README.md
 ├── PanCancer_MultiOmics_Data_Loading_&_EDA.ipynb        ✓ complete
-├── PanCancer_MultiOmics_Preprocessing.ipynb              ⟳ in progress
+├── PanCancer_MultiOmics_Preprocessing.ipynb             ✓ complete
 ├── PanCancer_MultiOmics_PCA_Baseline.ipynb               planned
 ├── PanCancer_MultiOmics_Transformer_Autoencoder.ipynb    planned
 └── PanCancer_MultiOmics_Evaluation.ipynb                 planned
@@ -104,7 +104,7 @@ PanCancer-MultiOmics/
 ## Roadmap
 
 - [x] Data loading, alignment, and exploratory data analysis (Notebook 1)
-- [ ] Corrected preprocessing pipeline with feature selection (Notebook 2)
+- [x] Corrected preprocessing pipeline with feature selection (Notebook 2)
 - [ ] PCA baseline with data-driven k-selection via silhouette sweep (Notebook 3)
 - [ ] Transformer autoencoder for deep multi-omics embedding in PyTorch (Notebook 4)
 - [ ] Full evaluation — cluster interpretation, SHAP values, Kaplan-Meier survival curves (Notebook 5)
