@@ -1,0 +1,13 @@
+# Data files
+*.csv
+*.tsv
+*.npy
+*.npz
+aligned/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Python
+__pycache__/
+*.pyc
